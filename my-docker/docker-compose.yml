@@ -1,0 +1,94 @@
+# docker-compose.yml
+# -----------------------------------------
+# Run these commands in the same directory:
+# sudo dockerd
+# docker compose up --build
+# -----------------------------------------
+
+version: "3.9"
+
+services:
+  # -----------------------------
+  # Backend API Service
+  # -----------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: project_api
+
+    # Map container port to host
+    ports:
+      - "5000:5000"
+
+    # Load environment variables (DB credentials, secrets)
+    env_file:
+      - .env
+
+    # Start this after database is ready
+    depends_on:
+      - db
+
+    # Mount code directory for live reload in dev mode
+    volumes:
+      - ./app:/app
+      - ./logs:/app/logs
+
+    # Restart policy for resilience
+    restart: unless-stopped
+
+    # Optional network configuration (for complex systems)
+    networks:
+      - backend
+
+  # -----------------------------
+  # PostgreSQL Database Service
+  # -----------------------------
+  db:
+    image: postgres:15
+    container_name: project_db
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+    networks:
+      - backend
+
+  # -----------------------------
+  # Optional pgAdmin (UI for DB)
+  # -----------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: project_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+# -----------------------------
+# Named Volumes
+# -----------------------------
+volumes:
+  db_data:
+
+# -----------------------------
+# Networks
+# -----------------------------
+networks:
+  backend:
+    driver: bridge
