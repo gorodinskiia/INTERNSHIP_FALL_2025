@@ -1,5 +1,7 @@
 # INTERNSHIP_FALL_2025
 
+docs/teams/modules
+
 I will be implementing the entire core backend infastructure that powers the Knowledge Graph Lab System
 
 TOPIC 1: 
@@ -8,6 +10,18 @@ Docker Compose Patterns for Multi-Service Applications
 Download docker in terminal
     - type "sudo dockerd" in terminal
     - this starts docker
+
+Minimal setup to get Docker running locally:
+
+1. Dockerfile for your service(s)
+
+2. docker-compose.yml to define and orchestrate services
+
+3. .env for environment variables
+
+4. (Optional) docker-compose.override.yml for local development tweaks
+
+5. (Optional) volumes & init scripts for database persistence or setup
 
 *Docker Compose Patterns for Multi-Service Applications*
 

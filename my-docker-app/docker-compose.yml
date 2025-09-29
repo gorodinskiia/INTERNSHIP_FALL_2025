@@ -1,0 +1,70 @@
+# Lines to run docker in terminal
+# make sure to be in directory of docker-compose.yml file and Dockerfile
+
+# sudo dockerd
+# docker compose up or docker compose up --build
+
+
+
+
+
+# Specify the version of Docker Compose syntax
+version: "3.9"
+
+services:
+  # -----------------------------
+  # API service (your application)
+  # -----------------------------
+  api:
+    # Build the Docker image from the Dockerfile in the current directory (.)
+    build: .
+    
+    # Map container port 5000 to host port 5000
+    # Allows you to access the API via http://localhost:5000
+    ports:
+      - "5000:5000"
+    
+    # Load environment variables from a .env file
+    # Useful for secrets like database credentials or API keys
+    env_file:
+      - .env
+    
+    # Ensure the database service starts before this API service
+    depends_on:
+      - db
+    
+    # Mount the local "app" directory into the container at /app
+    # This allows live code updates during development without rebuilding the image
+    volumes:
+      - ./app:/app  # Optional for development
+
+  # -----------------------------
+  # Database service
+  # -----------------------------
+  db:
+    # Use the official PostgreSQL image, version 15
+    image: postgres:15
+    
+    # Set environment variables for PostgreSQL
+    # These values come from the .env file (via ${VARIABLE_NAME})
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}       # Database username
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Database password
+      POSTGRES_DB: ${POSTGRES_DB}           # Name of the initial database to create
+    
+    # Map container port 5432 to host port 5432
+    # Allows you to connect to the database from the host (e.g., via pgAdmin or psql)
+    ports:
+      - "5432:5432"
+    
+    # Persist database data using a named Docker volume
+    # This ensures data survives container restarts or rebuilds
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+# -----------------------------
+# Define named volumes
+# -----------------------------
+volumes:
+  # Named volume for database persistence
+  db_data:
