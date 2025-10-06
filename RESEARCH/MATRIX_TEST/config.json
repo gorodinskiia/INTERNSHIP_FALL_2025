@@ -1,0 +1,9 @@
+{
+  "default_server_config": {
+    "m.homeserver": {
+      "base_url": "http://synapse:8008",
+      "server_name": "localhost"
+    }
+  },
+  "disable_custom_urls": false
+}

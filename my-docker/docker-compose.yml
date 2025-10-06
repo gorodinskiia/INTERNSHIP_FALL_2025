@@ -1,94 +1,46 @@
+# -----------------------------------------
 # docker-compose.yml
 # -----------------------------------------
 # Run these commands in the same directory:
-# sudo dockerd
-# docker compose up --build
+# sudo dockerd               # Start Docker daemon (if not running)
+# docker compose up --build  # Build and start all containers
 # -----------------------------------------
 
+# Use Docker Compose version 3.9 syntax (latest stable for most setups)
 version: "3.9"
 
+# Define all services (containers) that will run
 services:
+
   # -----------------------------
   # Backend API Service
   # -----------------------------
   api:
+    # Build the image using the local Dockerfile
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: .             # Use current directory as build context
+      dockerfile: Dockerfile # Specify which Dockerfile to use (optional if named "Dockerfile")
 
+    # Name the container for easier reference
     container_name: project_api
 
-    # Map container port to host
+    # Expose ports between host and container
+    # Format: "HOST_PORT:CONTAINER_PORT"
     ports:
-      - "5000:5000"
+      - "5000:5000"          # Maps local port 5000 → container port 5000
 
-    # Load environment variables (DB credentials, secrets)
+    # Load environment variables from external .env file
     env_file:
-      - .env
+      - .env                 # Path to .env file containing key=value pairs
 
-    # Start this after database is ready
+    # Ensure the API waits until the database container is ready
     depends_on:
-      - db
+      - db                   # db service must start before this one
 
-    # Mount code directory for live reload in dev mode
+    # Mount local folders into the container
     volumes:
-      - ./app:/app
-      - ./logs:/app/logs
+      - ./app:/app           # Mount local "app" directory to /app inside container
+      - ./logs:/app/logs     # Mount local "logs" directory for persistent logs
 
-    # Restart policy for resilience
-    restart: unless-stopped
-
-    # Optional network configuration (for complex systems)
-    networks:
-      - backend
-
-  # -----------------------------
-  # PostgreSQL Database Service
-  # -----------------------------
-  db:
-    image: postgres:15
-    container_name: project_db
-
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-
-    ports:
-      - "5432:5432"
-
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
-    restart: unless-stopped
-    networks:
-      - backend
-
-  # -----------------------------
-  # Optional pgAdmin (UI for DB)
-  # -----------------------------
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: project_pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    networks:
-      - backend
-
-# -----------------------------
-# Named Volumes
-# -----------------------------
-volumes:
-  db_data:
-
-# -----------------------------
-# Networks
-# -----------------------------
-networks:
-  backend:
-    driver: bridge
+    # Automatically restart container if it stops unexpectedly
+    restart: unles

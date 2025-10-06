@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  synapse:
+    image: matrixdotorg/synapse:latest
+    container_name: synapse
+    restart: unless-stopped
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./synapse:/data
+    environment:
+      SYNAPSE_SERVER_NAME: localhost
+      SYNAPSE_REPORT_STATS: "no"
+    command: >
+      bash -c "
+        if [ ! -f /data/homeserver.yaml ]; then
+          generate
+          migrate
+        fi
+        start"
+
+  element:
+    image: vectorim/element-web
+    container_name: element
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - synapse
+    volumes:
+      - ./config.json:/app/config.json
