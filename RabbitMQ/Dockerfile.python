@@ -1,0 +1,79 @@
+# Multi-stage Dockerfile for RabbitMQ Python Examples
+FROM python:3.11-alpine AS base
+
+# Install security updates and required packages
+RUN apk update && apk upgrade && \
+    apk add --no-cache curl && \
+    rm -rf /var/cache/apk/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy requirements
+COPY examples/python/requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Production stage
+FROM base AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S python && \
+    adduser -S python -u 1001
+
+# Copy application code
+COPY examples/python/ .
+
+# Create logs directory
+RUN mkdir -p logs && chown -R python:python logs
+
+# Switch to non-root user
+USER python
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD python healthcheck.py || exit 1
+
+# Default command
+CMD ["python", "basic_consumer.py"]
+
+# Development stage
+FROM base AS development
+
+# Copy application code
+COPY examples/python/ .
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Development command
+CMD ["python", "basic_consumer.py"]
+
+# Producer stage
+FROM base AS producer
+
+# Copy application code
+COPY examples/python/ .
+
+# Producer command
+CMD ["python", "basic_producer.py"]
+
+# Consumer stage
+FROM base AS consumer
+
+# Copy application code
+COPY examples/python/ .
+
+# Consumer command
+CMD ["python", "basic_consumer.py"]
+
+# Healthcheck stage
+FROM base AS healthcheck
+
+# Copy application code
+COPY examples/python/ .
+
+# Health check command
+CMD ["python", "healthcheck.py"]
+

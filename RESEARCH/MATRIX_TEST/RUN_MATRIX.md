@@ -1,5 +1,9 @@
-1. sudo apt install flatpak
+
+
+- mkdir matrix-sandbox
+- cd matrix-sandbox
 
 - sudo dockerd
+- docker compose run --rm synapse generate
 - docker compose up
-- docker run -d -p 8080:80 vectorim/element-web
+

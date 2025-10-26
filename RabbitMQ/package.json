@@ -1,0 +1,60 @@
+{
+  "name": "rabbitmq-examples",
+  "version": "1.0.0",
+  "description": "Comprehensive RabbitMQ messaging examples with multiple patterns",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest",
+    "lint": "eslint examples/**/*.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "healthcheck": "node healthcheck.js",
+    "examples:basic": "node examples/basic/index.js",
+    "examples:direct": "node examples/direct/index.js",
+    "examples:topic": "node examples/topic/index.js",
+    "examples:fanout": "node examples/fanout/index.js",
+    "examples:rpc": "node examples/rpc/index.js",
+    "examples:headers": "node examples/headers/index.js",
+    "examples:confirms": "node examples/confirms/index.js",
+    "examples:priority": "node examples/priority/index.js"
+  },
+  "keywords": [
+    "rabbitmq",
+    "amqp",
+    "messaging",
+    "queue",
+    "producer",
+    "consumer",
+    "rpc",
+    "pub-sub"
+  ],
+  "author": "RabbitMQ Examples",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "uuid": "^9.0.0",
+    "dotenv": "^16.0.3",
+    "winston": "^3.8.2",
+    "bluebird": "^3.7.2"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "eslint": "^8.40.0",
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/rabbitmq-examples.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/rabbitmq-examples/issues"
+  },
+  "homepage": "https://github.com/your-username/rabbitmq-examples#readme"
+}
+
